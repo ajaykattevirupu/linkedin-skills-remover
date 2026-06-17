@@ -1,7 +1,7 @@
 (async () => {
   const delay = ms => new Promise(res => setTimeout(res, ms));
 
-  function waitForText(text, timeout = 5000) {
+  function waitForButton(text, timeout = 5000) {
     return new Promise(resolve => {
       const start = Date.now();
 
@@ -18,26 +18,28 @@
           clearInterval(timer);
           resolve(null);
         }
-      }, 300);
+      }, 250);
     });
   }
 
   let count = 0;
 
   while (true) {
-    const editLink = document.querySelector('a[aria-label$=" skill"]');
+    const editLink = document.querySelector(
+      'a[aria-label^="Edit "][aria-label$=" skill"]'
+    );
 
     if (!editLink) {
       console.log(`Done! Deleted ${count} skill(s).`);
       break;
     }
 
-    console.log(`Opening: ${editLink.getAttribute('aria-label')}`);
+    console.log(`Opening ${editLink.getAttribute('aria-label')}`);
     editLink.click();
 
     await delay(1000);
 
-    const deleteBtn = await waitForText('Delete skill');
+    const deleteBtn = await waitForButton('Delete skill');
 
     if (!deleteBtn) {
       console.log('Delete skill button not found.');
@@ -46,7 +48,9 @@
 
     deleteBtn.click();
 
-    const confirmBtn = await waitForText('Delete');
+    await delay(500);
+
+    const confirmBtn = await waitForButton('Delete');
 
     if (!confirmBtn) {
       console.log('Delete confirmation button not found.');
