@@ -1,46 +1,63 @@
-// had to delete 90+ skills manually one by one... never again.
-// run this on https://www.linkedin.com/in/{your-username}/details/skills/
-
 (async () => {
   const delay = ms => new Promise(res => setTimeout(res, ms));
 
-  function waitFor(buttonText, timeout = 5000) {
+  function waitForText(text, timeout = 5000) {
     return new Promise(resolve => {
-      const interval = setInterval(() => {
-        const btn = Array.from(document.querySelectorAll('button')).find(b => b.textContent.trim() === buttonText);
-        if (btn) { clearInterval(interval); resolve(btn); }
+      const start = Date.now();
+
+      const timer = setInterval(() => {
+        const btn = [...document.querySelectorAll('button')]
+          .find(b => b.textContent.trim() === text);
+
+        if (btn) {
+          clearInterval(timer);
+          resolve(btn);
+        }
+
+        if (Date.now() - start > timeout) {
+          clearInterval(timer);
+          resolve(null);
+        }
       }, 300);
-      setTimeout(() => { clearInterval(interval); resolve(null); }, timeout);
     });
   }
 
   let count = 0;
 
   while (true) {
-    const editLink = document.querySelector('a[aria-label="Edit skill"]');
+    const editLink = document.querySelector('a[aria-label$=" skill"]');
+
     if (!editLink) {
       console.log(`Done! Deleted ${count} skill(s).`);
       break;
     }
 
+    console.log(`Opening: ${editLink.getAttribute('aria-label')}`);
     editLink.click();
 
-    const deleteBtn = await waitFor('Delete skill');
+    await delay(1000);
+
+    const deleteBtn = await waitForText('Delete skill');
+
     if (!deleteBtn) {
-      console.log(`Stopped at skill #${count} — "Delete skill" button not found.`);
+      console.log('Delete skill button not found.');
       break;
     }
+
     deleteBtn.click();
 
-    const confirmBtn = await waitFor('Delete');
+    const confirmBtn = await waitForText('Delete');
+
     if (!confirmBtn) {
-      console.log(`Stopped at skill #${count} — confirm button not found.`);
+      console.log('Delete confirmation button not found.');
       break;
     }
+
     confirmBtn.click();
 
-    await delay(2500);
     count++;
     console.log(`Deleted skill #${count}`);
+
+    await delay(2500);
   }
 })();
