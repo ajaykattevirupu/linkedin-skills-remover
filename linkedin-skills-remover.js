@@ -26,8 +26,9 @@
 
   while (true) {
     const editLink = document.querySelector(
-      'a[aria-label^="Edit "][aria-label$=" skill"]'
-    );
+  'a[aria-label^="Edit "][aria-label$=" skill"]'
+);
+    
 
     if (!editLink) {
       console.log(`Done! Deleted ${count} skill(s).`);
